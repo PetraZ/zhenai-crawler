@@ -25,6 +25,9 @@ func Run(seeds []parser.Request) error {
 		if parserResult == nil {
 			continue
 		}
+		if parserResult.Items != nil {
+			log.Print(parserResult.Items[0])
+		}
 		for _, newRequest := range parserResult.Requests {
 			requests = append(requests, newRequest)
 		}
