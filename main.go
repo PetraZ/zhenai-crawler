@@ -12,4 +12,9 @@ func main() {
 			ParseFunc: parser.ParseCityList,
 		},
 	})
+	// r, err := fetcher.Fetch("https://www.zhenai.com/zhenghun/xiamen")
+	// if err != nil {
+	// 	fmt.Println(err)
+	// }
+	// parser.ParseCity(r)
 }

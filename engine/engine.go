@@ -12,24 +12,27 @@ func Run(seeds []parser.Request) error {
 	for _, seed := range seeds {
 		requests = append(requests, seed)
 	}
-
+	var users []parser.UserProfile
 	for len(requests) > 0 {
 		request := requests[0]
 		requests = requests[1:]
 		bs, err := fetcher.Fetch(request.URL)
 		log.Printf("Fetching %s", request.URL)
+		log.Printf("Number of request %d", len(requests))
 		if err != nil {
-			return err
+			log.Printf(err.Error())
+			continue
 		}
 		parserResult := request.ParseFunc(bs)
 		if parserResult == nil {
 			continue
 		}
 		if parserResult.Items != nil {
-			log.Print(parserResult.Items[0])
+			users = append(users, parserResult.Items...)
+			log.Printf("We now have %v user profiles", len(users))
 		}
-		for _, newRequest := range parserResult.Requests {
-			requests = append(requests, newRequest)
+		if parserResult.Requests != nil {
+			requests = append(requests, parserResult.Requests...)
 		}
 	}
 	return nil
