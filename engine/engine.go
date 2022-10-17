@@ -7,33 +7,12 @@ import (
 	"github.com/PetraZ/zhenai-crawler/parser"
 )
 
-func Run(seeds []parser.Request) error {
-	var requests []parser.Request
-	for _, seed := range seeds {
-		requests = append(requests, seed)
+func HandleRequest(r parser.Request) (*parser.ParseResult, error) {
+	log.Printf("Fetching %s", r.URL)
+	bs, err := fetcher.Fetch(r.URL)
+	if err != nil {
+		return nil, err
 	}
-	var users []parser.UserProfile
-	for len(requests) > 0 {
-		request := requests[0]
-		requests = requests[1:]
-		bs, err := fetcher.Fetch(request.URL)
-		log.Printf("Fetching %s", request.URL)
-		log.Printf("Number of request %d", len(requests))
-		if err != nil {
-			log.Printf(err.Error())
-			continue
-		}
-		parserResult := request.ParseFunc(bs)
-		if parserResult == nil {
-			continue
-		}
-		if parserResult.Items != nil {
-			users = append(users, parserResult.Items...)
-			log.Printf("We now have %v user profiles", len(users))
-		}
-		if parserResult.Requests != nil {
-			requests = append(requests, parserResult.Requests...)
-		}
-	}
-	return nil
+	parserResult := r.ParseFunc(bs)
+	return parserResult, nil
 }

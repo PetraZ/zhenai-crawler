@@ -41,7 +41,7 @@ func ParseCityList(bs []byte) *ParseResult {
 			URL:       string(url),
 			ParseFunc: ParseCity})
 	}
-	fmt.Println(len(matches))
+	fmt.Println("The number of cities are: ", len(matches))
 	return &ParseResult{
 		Requests: requests,
 		Items:    nil,
@@ -119,16 +119,3 @@ func ParseCity(bs []byte) *ParseResult {
 		Items:    users,
 	}
 }
-
-// // Given query user is anti-crawled at the moment.
-// // We only parse user info on the city info page
-// func ParseUser(bs []byte) *ParseResult {
-// 	match := userReg.FindSubmatch(bs)
-// 	user := UserProfile{
-// 		Name: string(match[1]),
-// 	}
-// 	return &ParseResult{
-// 		Requests: nil,
-// 		Items:    []UserProfile{user},
-// 	}
-// }
