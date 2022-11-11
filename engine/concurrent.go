@@ -3,18 +3,22 @@ package engine
 import (
 	"log"
 
+	"github.com/PetraZ/zhenai-crawler/model"
 	"github.com/PetraZ/zhenai-crawler/parser"
 )
 
-type ConcurrentEngine struct{}
+type ConcurrentEngine struct {
+	NumWorkers   int
+	ItemSaveChan chan model.UserProfile
+}
 
 func (e ConcurrentEngine) Run(seeds []parser.Request) error {
 
 	// Creating work pool
 	in := make(chan parser.Request)
 	out := make(chan *parser.ParseResult)
-	numWorkers := 10
-	log.Println("Creating workers ...")
+	numWorkers := e.NumWorkers
+	log.Printf("Creating %d workers ...", numWorkers)
 	for i := 0; i < numWorkers; i++ {
 		CreateWorker(i, in, out)
 	}
@@ -27,15 +31,15 @@ func (e ConcurrentEngine) Run(seeds []parser.Request) error {
 		log.Printf("Initial seeds are filled")
 	}()
 
-	var users []parser.UserProfile
 	for {
 		result := <-out
 		if result == nil {
 			continue
 		}
 		if result.Items != nil {
-			users = append(users, result.Items...)
-			log.Printf("We now have %v user profiles", len(users))
+			for _, user := range result.Items {
+				go func(user model.UserProfile) { e.ItemSaveChan <- user }(user)
+			}
 		}
 		go func() {
 			for _, r := range result.Requests {

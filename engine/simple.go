@@ -3,6 +3,7 @@ package engine
 import (
 	"log"
 
+	"github.com/PetraZ/zhenai-crawler/model"
 	"github.com/PetraZ/zhenai-crawler/parser"
 )
 
@@ -10,17 +11,17 @@ type SimpleEngine struct{}
 
 func (SimpleEngine) Run(seeds []parser.Request) error {
 	var requests []parser.Request
-	for _, seed := range seeds {
-		requests = append(requests, seed)
-	}
-	var users []parser.UserProfile
+
+	requests = append(requests, seeds...)
+
+	var users []model.UserProfile
 	for len(requests) > 0 {
 		request := requests[0]
 		requests = requests[1:]
 
 		parserResult, err := HandleRequest(request)
 		if err != nil {
-			log.Printf(err.Error())
+			log.Println(err.Error())
 			continue
 		}
 		if parserResult == nil {

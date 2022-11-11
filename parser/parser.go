@@ -6,6 +6,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/PetraZ/zhenai-crawler/model"
 	"github.com/PuerkitoBio/goquery"
 )
 
@@ -28,7 +29,7 @@ type Request struct {
 
 type ParseResult struct {
 	Requests []Request
-	Items    []UserProfile
+	Items    []model.UserProfile
 }
 
 // Top level - city list
@@ -48,23 +49,9 @@ func ParseCityList(bs []byte) *ParseResult {
 	}
 }
 
-type UserProfile struct {
-	ID           string
-	Name         string
-	URL          string
-	Sex          string
-	Location     string
-	Age          string
-	Education    string
-	Marriage     string
-	Height       string
-	Salary       string
-	Introduction string
-}
-
 func ParseCity(bs []byte) *ParseResult {
 	var requests []Request
-	var users []UserProfile
+	var users []model.UserProfile
 	// Parsing html page
 	doc, err := goquery.NewDocumentFromReader(bytes.NewReader(bs))
 	if err != nil {
@@ -72,7 +59,7 @@ func ParseCity(bs []byte) *ParseResult {
 	}
 
 	doc.Find(".list-item > .content").Each(func(i int, s *goquery.Selection) {
-		user := UserProfile{}
+		user := model.UserProfile{}
 		user.Name = s.Find("a").Text()
 		personUrl, _ := s.Find("a").Attr("href")
 		user.URL = personUrl
